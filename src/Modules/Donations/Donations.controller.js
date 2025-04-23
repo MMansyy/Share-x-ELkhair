@@ -73,9 +73,11 @@ export const updateDonation = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     let data = req.body;
     data.userID = req.user._id
-    data.foodItems = { name: data.name, quantity: data.quantity }
-    delete data.name;
-    delete data.quantity;
+    if (data.name && data.quantity) {
+        data.foodItems = { name: data.name, quantity: data.quantity }
+        delete data.name;
+        delete data.quantity;
+    }
     const donation = await donationModel.findById(id);
     if (!donation) {
         return next(new AppError("Donation not found", 404));
