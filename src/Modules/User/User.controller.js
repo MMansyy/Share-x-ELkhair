@@ -2,6 +2,7 @@ import userModel from "../../../DB/Models/user.model.js";
 import cloudinary from "../../../utils/cloudinary.js";
 import fs from "fs";
 import { AppError, asyncHandler } from "../../../utils/GlobalError.js";
+import bcrypt from "bcrypt";
 
 export const getMe = asyncHandler(async (req, res, next) => {
     if (!req.user) {
@@ -71,6 +72,30 @@ export const updateProfilePicture = asyncHandler(async (req, res, next) => {
     return next(new AppError("Image is required", 400));
 })
 
+// update password 
+export const updatePassword = asyncHandler(async (req, res, next) => {
+    const { _id } = req.user;
+    const { password } = req.body;
+    if (!password) {
+        return next(new AppError("Password is required", 400));
+    }
+    const isExist = await userModel.findById(_id);
+
+    if (!isExist) {
+        return next(new AppError("User not found", 404));
+    }
+    const compare = bcrypt.compareSync(password, isExist.password);
+    if (!compare) {
+        return next(new AppError("Password is not correct", 400));
+    }
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    const updatedUser = await userModel.findByIdAndUpdate(_id, { password: hashedPassword }, { new: true, runValidators: true });
+    if (!updatedUser) {
+        return next(new AppError("User not found", 404));
+    }
+
+    res.status(200).json({ message: "hello son of hakuna matata", user: updatedUser });
+})
 
 
 

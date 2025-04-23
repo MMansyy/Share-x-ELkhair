@@ -76,10 +76,6 @@ export const updateDonation = asyncHandler(async (req, res, next) => {
     data.foodItems = { name: data.name, quantity: data.quantity }
     delete data.name;
     delete data.quantity;
-    const valid = donationSchema.validate(data, { abortEarly: false });
-    if (valid.error) {
-        return next(new AppError(valid.error.details.map(err => err.message).join(", "), 400));
-    }
     const donation = await donationModel.findById(id);
     if (!donation) {
         return next(new AppError("Donation not found", 404));
@@ -136,36 +132,3 @@ export const deleteDonation = asyncHandler(async (req, res, next) => {
 
 
 
-// export const createDonation = asyncHandler(async (req, res, next) => {
-//     const roles = ["donor", "restaurant"];
-//     if (!roles.includes(req.user.role)) {
-//         return next(new AppError("You are not allowed to create donation", 400));
-//     }
-//     req.body.image = { url: "default.jpg", publicId: null }
-//     if (req.file && req.file.mimetype.startsWith("image")) {
-//         try {
-//             const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: "donation", format: 'webp', quality: 'auto:low' });
-//             req.body.image = { url: secure_url, publicId: public_id }
-
-//         } catch (err) {
-//             return next(new AppError(err.message, 500));
-//         }
-//     }
-//     if (req.file) {
-//         fs.unlinkSync(req.file.path);
-//         console.log("File deleted successfully");
-//     }
-//     let { category, foodItems, description, image } = req.body;
-//     if (!category || !foodItems || !description || !image) {
-//         return next(new AppError("Please provide all the required fields", 400));
-//     }
-//     if (typeof foodItems === "string") {
-//         foodItems = JSON.parse(foodItems);
-//     }
-//     const donation = await donationModel.create({ userID: req.user._id, category, foodItems, description, image });
-//     if (!donation) {
-//         await cloudinary.uploader.destroy(image.publicId);
-//         return next(new AppError("Donation not created", 400));
-//     }
-//     return res.status(201).json({ message: "hello son of hakuna matata", donation });
-// })

@@ -2,28 +2,7 @@ import donationModel from "../../../DB/Models/donation.model.js";
 import requestModel from "../../../DB/Models/request.model";
 import { AppError, asyncHandler } from "../../../utils/GlobalError.js";
 
-// export const createRequest = asyncHandler(async (req, res, next) => {
-//     const { donationID } = req.body;
-//     const charityID = req.user.id;
 
-
-//     const isRequested = await requestModel.findOne({ donationID, charityID });
-//     if (isRequested) {
-//         return next(new AppError("You have already requested this donation", 400));
-//     }
-//     const donation = await donationModel.findById(donationID);
-//     if (!donation) {
-//         return next(new AppError("Donation not found", 404));
-//     }
-//     if (donation.donationStatus !== "available") {
-//         return next(new AppError("This donation is no longer available", 400));
-//     }
-//     const request = await requestModel.create({ donationID, charityID, userID: donation.userID });
-//     if (!request) {
-//         return next(new AppError("Request not created", 400));
-//     }
-//     return res.status(201).json({ success: true, data: request });
-// })
 
 
 export const createRequest = asyncHandler(async (req, res, next) => {

@@ -44,10 +44,12 @@ export const protectedRoutes = asyncHandler(async (req, res, next) => {
         return next(new AppError("Token is required", 400));
     }
     if (!token.startsWith('mansy_')) {
-        return next(new AppError("Token is not valid", 400));
+        return next(new AppError("Token barrier is not valid", 400));
     }
-
-    let realToken = token.split('_')[1];
+    
+    let realToken = token.split('__')[1];
+    console.log(realToken );
+    
     const decoded = jwt.verify(realToken, 'mansy');
     if (!decoded) {
         return next(new AppError("Token is not valid", 400));
