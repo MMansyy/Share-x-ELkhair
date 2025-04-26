@@ -11,44 +11,47 @@ export const login = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
     const isExist = await userModel.findOne({ email });
     if (!isExist) {
-        next(new AppError("User not found", 404));
+        return next(new AppError("User not found", 404));
     }
-    const compare = await bcrypt.compareSync(password, isExist.password);
+    const compare = bcrypt.compareSync(password, isExist.password);
     if (!compare) {
-        next(new AppError("Password is not correct", 400));
+        return next(new AppError("Password is not correct", 400));
     }
-    const token = jwt.sign({ id: isExist._id, name: isExist.name, role: isExist.role }, 'mansy')
+    const token = jwt.sign(
+        { id: isExist._id, name: isExist.name, role: isExist.role },
+        process.env.JWT_SECRET
+    );
     res.status(200).json({ message: "hello son of hakuna matata", token });
-})
-
+});
 
 export const register = asyncHandler(async (req, res, next) => {
     const { name, email, password, phone, city, address, details, role } = req.body;
     const isExist = await userModel.findOne({ email });
     if (isExist) {
-        next(new AppError("User already exist", 400));
+        return next(new AppError("User already exist", 400));
     }
     const user = await userModel.create({ name, email, password, phone, role, city, address });
-    const token = jwt.sign({ id: user._id, name: user.name }, 'mansy')
+    const token = jwt.sign(
+        { id: user._id, name: user.name },
+        process.env.JWT_SECRET
+    );
     await sendEmail(user.email, "Verify your email", "please verify your email", token)
         .then(() => console.log("email sent"))
         .catch(() => console.log("email not sent"));
     res.status(201).json({ message: { status: "done" }, user });
-
-})
-
+});
 
 export const protectedRoutes = asyncHandler(async (req, res, next) => {
     const { token } = req.headers;
     if (!token) {
         return next(new AppError("Token is required", 400));
     }
-    if (!token.startsWith('mansy_')) {
+    if (!token.startsWith(process.env.JWT_BARRIER)) {
         return next(new AppError("Token barrier is not valid", 400));
     }
-    
+
     let realToken = token.split('__')[1];
-    const decoded = jwt.verify(realToken, 'mansy');
+    const decoded = jwt.verify(realToken, process.env.JWT_SECRET);
     if (!decoded) {
         return next(new AppError("Token is not valid", 400));
     }
@@ -61,10 +64,9 @@ export const protectedRoutes = asyncHandler(async (req, res, next) => {
         return next(new AppError("Email is not verified", 400));
     }
     req.user = isExist;
-    console.log("hello from here" , realToken);
+    console.log("hello from here", realToken);
     next();
-})
-
+});
 
 
 export const allowTo = (...roles) => {

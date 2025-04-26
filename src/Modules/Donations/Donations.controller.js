@@ -34,7 +34,7 @@ export const createDonation = asyncHandler(async (req, res, next) => {
             const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: "donation", format: 'webp', quality: 'auto:low' });
             req.body.image = { url: secure_url, publicId: public_id }
         } catch (err) {
-            return next(new AppError(err.message, 500));
+            return next(new AppError(err, 500));
         }
     }
     if (req.file) {

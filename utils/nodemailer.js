@@ -1,20 +1,20 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-        user: 'fifa.eslam777@gmail.com',
-        pass: 'wzwn pjlx dopp noij'
-    },
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
 });
 
 
 
 // async..await is not allowed in global scope, must use a wrapper
 export default async function sendEmail(to, subject, text, token) {
-    let html = `<head>
+  let html = `<head>
   <title></title>
   <!--[if !mso]><!-- -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -172,18 +172,18 @@ export default async function sendEmail(to, subject, text, token) {
       <![endif]--></div>
 
 </body>`
-    // send mail with defined transport object
-    console.log("sending email");
+  // send mail with defined transport object
+  console.log("sending email");
 
-    const info = await transporter.sendMail({
-        from: '"Mansy 👻" <fifa.eslam777@gmail.com>', // sender address
-        to,
-        subject,
-        text,
-        html// html body
-    });
+  const info = await transporter.sendMail({
+    from: '"Mansy 👻" <fifa.eslam777@gmail.com>', // sender address
+    to,
+    subject,
+    text,
+    html// html body
+  });
 
-    console.log("Message sent: %s", info.messageId);
-    // Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
+  console.log("Message sent: %s", info.messageId);
+  // Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
 }
 
