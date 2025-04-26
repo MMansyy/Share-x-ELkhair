@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
 app.use('/auth', AuthRouter);
 app.use('/user', UserRoutes);
-app.use('/donation', DonationRouter); \
+app.use('/donation', DonationRouter);
 app.use('*', (req, res) => {
     res.status(404).json({ message: "Not Found" });
 });
