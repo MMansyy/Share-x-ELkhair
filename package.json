@@ -7,6 +7,9 @@
     "build": "echo 'No build step required' && exit 0",
     "vercel-build": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
+  }, 
+  "engines": {
+    "node": "22.12.x"
   },
   "keywords": [],
   "author": "",
