@@ -48,8 +48,6 @@ export const protectedRoutes = asyncHandler(async (req, res, next) => {
     }
     
     let realToken = token.split('__')[1];
-    console.log(realToken );
-    
     const decoded = jwt.verify(realToken, 'mansy');
     if (!decoded) {
         return next(new AppError("Token is not valid", 400));
@@ -63,7 +61,7 @@ export const protectedRoutes = asyncHandler(async (req, res, next) => {
         return next(new AppError("Email is not verified", 400));
     }
     req.user = isExist;
-    console.log("hello from here");
+    console.log("hello from here" , realToken);
     next();
 })
 

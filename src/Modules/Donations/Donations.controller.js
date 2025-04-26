@@ -6,7 +6,7 @@ import donationSchema from "./Donation.validation.js";
 
 
 export const getDonations = asyncHandler(async (req, res, next) => {
-    const donations = await donationModel.find({ donationStatus: "available" }).populate("userID", "name phone city address");
+    const donations = await donationModel.find({ donationStatus: "available" }).populate("userID", "name phone city address profilePicture")
     res.status(200).json({ message: "hello son of hakuna matata", donations });
 })
 
@@ -22,7 +22,7 @@ export const getSingleDonation = asyncHandler(async (req, res, next) => {
 
 export const getMyDonations = asyncHandler(async (req, res, next) => {
     console.log(req.user._id);
-    const donations = await donationModel.find({ userID: req.user._id }).populate("userID", "name phone city address");
+    const donations = await donationModel.find({ userID: req.user._id }).populate("userID", "name phone city address profilePicture");
     res.status(200).json({ message: "hello son of hakuna matata", donations });
 })
 
@@ -84,7 +84,7 @@ export const updateDonation = asyncHandler(async (req, res, next) => {
     }
     console.log(donation.userID.toString(), req.user._id.toString());
 
-    if (donation.userID.toString() != req.user._id.toString() && req.user.role !== "admin") {
+    if (donation.userID.toString() !== req.user._id.toString() && req.user.role !== "admin") {
         return next(new AppError("You are not allowed to update this donation", 400));
     }
     if (req.file && req.file.mimetype.startsWith("image")) {
@@ -99,7 +99,9 @@ export const updateDonation = asyncHandler(async (req, res, next) => {
         }
     }
     if (req.file) {
-        fs.unlinkSync(req.file.path);
+        fs.unlink(req.file.path, (err) => {
+            if (err) console.error("Error deleting temp image:", err);
+        });
     }
     const updatedDonation = await donationModel.findByIdAndUpdate(id, data, { new: true });
     if (!updatedDonation) {

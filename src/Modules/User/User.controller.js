@@ -75,20 +75,22 @@ export const updateProfilePicture = asyncHandler(async (req, res, next) => {
 // update password 
 export const updatePassword = asyncHandler(async (req, res, next) => {
     const { _id } = req.user;
-    const { password } = req.body;
-    if (!password) {
-        return next(new AppError("Password is required", 400));
+    const { currentPassword, newPassword } = req.body;
+    if (currentPassword === newPassword) {
+        return next(new AppError("New password must be different from current password", 400));
+    }
+    if (!currentPassword || !newPassword) {
+        return next(new AppError("Current password and new password are required", 400));
     }
     const isExist = await userModel.findById(_id);
-
     if (!isExist) {
         return next(new AppError("User not found", 404));
     }
-    const compare = bcrypt.compareSync(password, isExist.password);
+    const compare = bcrypt.compareSync(currentPassword, isExist.password);
     if (!compare) {
         return next(new AppError("Password is not correct", 400));
     }
-    const hashedPassword = bcrypt.hashSync(password, 10);
+    const hashedPassword = bcrypt.hashSync(newPassword, 10);
     const updatedUser = await userModel.findByIdAndUpdate(_id, { password: hashedPassword }, { new: true, runValidators: true });
     if (!updatedUser) {
         return next(new AppError("User not found", 404));

@@ -10,11 +10,11 @@ const DonationRouter = express.Router();
 
 
 DonationRouter.get('/', getDonations)
+    .post('/', protectedRoutes, allowTo("donor", "restaurant", "admin"), uploadSingle, createDonation)
     .get('/mydonations', protectedRoutes, getMyDonations)
     .get('/:id', getSingleDonation)
-    .post('/', protectedRoutes, allowTo("donor", "restaurant", "admin"), uploadSingle, createDonation)
     .put('/:id', protectedRoutes, uploadSingle, updateDonation)
     .delete('/:id', protectedRoutes, deleteDonation)
 
-    
+
 export default DonationRouter;

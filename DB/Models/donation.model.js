@@ -31,7 +31,7 @@ const donationSchema = new mongoose.Schema({
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 donationSchema.post("save", async function () {
-    await this.populate("userID", "name phone city address");
+    await this.populate("userID", "-password -__v -createdAt -updatedAt");
 });
 
 const donationModel = mongoose.model("Donation", donationSchema);
