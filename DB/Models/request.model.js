@@ -29,6 +29,16 @@ requestSchema.post("save", async function () {
         .populate("userID", "name phone city role address");
 })
 
+requestSchema.pre(/^find/, function (next) {
+    this.populate([
+        { path: "donationID", select: "category foodItems description image" },
+        { path: "userID", select: "name phone city role address profilePicture" },
+        { path: "charityID", select: "name phone city role address profilePicture" }
+    ]);
+    next();
+});
+
+
 const requestModel = mongoose.model("Request", requestSchema);
 
 export default requestModel;

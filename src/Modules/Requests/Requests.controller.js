@@ -28,9 +28,6 @@ export const createRequest = asyncHandler(async (req, res, next) => {
         userID: donation.userID
     });
 
-    request = await request.populate("donationID", "category foodItems description image");
-    request = await request.populate("userID", "name phone city role address");
-
     return res.status(201).json({ success: true, data: request });
 });
 
