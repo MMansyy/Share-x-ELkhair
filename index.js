@@ -6,6 +6,7 @@ import cors from 'cors';
 import UserRoutes from './src/Modules/User/User.routes.js';
 import DonationRouter from './src/Modules/Donations/Donation.routes.js';
 import dotenv from 'dotenv';
+import RequestRouter from './src/Modules/Requests/Requests.routes.js';
 
 
 
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use('/auth', AuthRouter);
 app.use('/user', UserRoutes);
 app.use('/donation', DonationRouter);
+app.use('/request', RequestRouter);
 app.use('*', (req, res) => {
     res.status(404).json({ message: "Not Found" });
 });

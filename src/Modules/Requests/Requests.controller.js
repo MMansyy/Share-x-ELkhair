@@ -1,5 +1,5 @@
 import donationModel from "../../../DB/Models/donation.model.js";
-import requestModel from "../../../DB/Models/request.model";
+import requestModel from "../../../DB/Models/request.model.js";
 import { AppError, asyncHandler } from "../../../utils/GlobalError.js";
 
 
@@ -31,6 +31,14 @@ export const createRequest = asyncHandler(async (req, res, next) => {
     return res.status(201).json({ success: true, data: request });
 });
 
+export async function getAllRequests(req, res, next) {
+    const requests = await requestModel.find();
+    if (!requests) {
+        return next(new AppError("No requests found", 404));
+    }
+    return res.status(200).json({ success: true, data: requests });
+}
+
 
 export const getChairtyRequest = asyncHandler(async (req, res, next) => {
     const charityID = req.user.id;
@@ -53,21 +61,31 @@ export const getDonorRequest = asyncHandler(async (req, res, next) => {
 
 export const updateRequest = asyncHandler(async (req, res, next) => {
     const { requestID, requestStatus } = req.body;
-    const request = await requestModel.findByIdAndUpdate(requestID, { requestStatus }, { new: true });
+    const request = await requestModel.findById(requestID);
     if (!request) {
         return next(new AppError("Request not found", 404));
     }
+    if (request.userID._id.toString() !== req.user.id && req.user.role !== "admin") {
+        return next(new AppError("You are not authorized to update this request", 403));
+    }
+    request.status = requestStatus;
+    await request.save();
     return res.status(200).json({ success: true, data: request });
 })
 
 
 export const deleteRequest = asyncHandler(async (req, res, next) => {
     const { requestID } = req.body;
-    const request = await requestModel.findByIdAndDelete(requestID);
+    const request = await requestModel.findById(requestID);
     if (!request) {
         return next(new AppError("Request not found", 404));
     }
+    if (request.charityID._id.toString() !== req.user.id && req.user.role !== "admin") {
+        return next(new AppError("You are not authorized to delete this request", 403));
+    }
+    await requestModel.findByIdAndDelete(requestID);
     return res.status(200).json({ success: true, data: {} });
-})
+});
+
 
 

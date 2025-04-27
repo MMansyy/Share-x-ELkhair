@@ -24,10 +24,10 @@ const requestSchema = new mongoose.Schema({
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 
-requestSchema.post("save", async function () {
-    await this.populate("donationID", "category foodItems description image")
-        .populate("userID", "name phone city role address");
-})
+// requestSchema.post("save", async function () {
+//     await this.populate("donationID", "category foodItems description image")
+//         .populate("userID", "name phone city role address");
+// })
 
 requestSchema.pre(/^find/, function (next) {
     this.populate([
