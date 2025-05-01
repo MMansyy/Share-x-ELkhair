@@ -34,6 +34,11 @@ donationSchema.post("save", async function () {
     await this.populate("userID", "-password -__v -createdAt -updatedAt");
 });
 
+
+donationSchema.pre(/^find/, async function () {
+    this.populate("userID");
+});
+
 const donationModel = mongoose.model("Donation", donationSchema);
 
 export default donationModel;

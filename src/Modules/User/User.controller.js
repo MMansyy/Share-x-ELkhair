@@ -55,6 +55,14 @@ export const updateUser = asyncHandler(async (req, res, next) => {
 export const updateProfilePicture = asyncHandler(async (req, res, next) => {
     const { _id } = req.user;
     console.log("Received File:", req.file);
+    const { profilePicture } = req.user;
+    if (profilePicture?.publicId) {
+        try {
+            await cloudinary.uploader.destroy(profilePicture.publicId);
+        } catch (err) {
+            return next(new AppError(err.message, 500));
+        }
+    }
     if (req.file && req.file.mimetype.startsWith("image")) {
         const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: "profile" });
         const isExist = await userModel.findByIdAndUpdate(_id, { profilePicture: { url: secure_url, publicId: public_id } }, { new: true, runValidators: true });

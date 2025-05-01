@@ -12,7 +12,7 @@ export const getDonations = asyncHandler(async (req, res, next) => {
 
 export const getSingleDonation = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const donation = await donationModel.findById(id).populate("userID", "name phone city address");
+    const donation = await donationModel.findById(id).populate("userID", "name phone city address profilePicture");
     if (!donation) {
         return next(new AppError("Donation not found", 404));
     }
@@ -22,7 +22,7 @@ export const getSingleDonation = asyncHandler(async (req, res, next) => {
 
 export const getMyDonations = asyncHandler(async (req, res, next) => {
     console.log(req.user._id);
-    const donations = await donationModel.find({ userID: req.user._id }).populate("userID", "name phone city address profilePicture");
+    const donations = await donationModel.find({ userID: req.user._id }).populate("userID", "name phone city address profilePicture").sort({ createdAt: -1 });
     res.status(200).json({ message: "hello son of hakuna matata", donations });
 })
 
@@ -82,9 +82,9 @@ export const updateDonation = asyncHandler(async (req, res, next) => {
     if (!donation) {
         return next(new AppError("Donation not found", 404));
     }
-    console.log(donation.userID.toString(), req.user._id.toString());
+    console.log(donation.userID._id.toString(), req.user._id.toString());
 
-    if (donation.userID.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+    if (donation.userID._id.toString() !== req.user._id.toString() && req.user.role !== "admin") {
         return next(new AppError("You are not allowed to update this donation", 400));
     }
     if (req.file && req.file.mimetype.startsWith("image")) {
@@ -121,7 +121,7 @@ export const deleteDonation = asyncHandler(async (req, res, next) => {
     if (!donation) {
         return next(new AppError("Donation not found", 404));
     }
-    if (donation.userID.toString() != req.user._id.toString() && req.user.role !== "admin") {
+    if (donation.userID._id.toString() != req.user._id.toString() && req.user.role !== "admin") {
         return next(new AppError("You are not allowed to delete this donation", 400));
     }
     if (donation.image?.publicId) {

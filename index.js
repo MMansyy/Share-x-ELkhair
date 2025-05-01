@@ -13,10 +13,10 @@ import RequestRouter from './src/Modules/Requests/Requests.routes.js';
 
 
 const app = express();
+dotenv.config({});
 app.use(cors({
     origin: "*"
 }));
-dotenv.config();
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
 app.use('/auth', AuthRouter);
