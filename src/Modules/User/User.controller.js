@@ -20,8 +20,16 @@ export const getUser = asyncHandler(async (req, res, next) => {
     res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
 })
 
+export const getAllUsers = asyncHandler(async (req, res, next) => {
+    const isExist = await userModel.find({}).select("-password -otpCode -__v -createdAt -updatedAt");
+    if (!isExist) {
+        return next(new AppError("User not found", 404));
+    }
+    res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
+})
+
 export const getCharites = asyncHandler(async (req, res, next) => {
-    const isExist = await userModel.find({ role: "charity" }, { password: 0 }).select("-password -otpCode -__v -createdAt -updatedAt");;
+    const isExist = await userModel.find({ role: "charity" }).select("-password -otpCode -__v -createdAt -updatedAt");;
     if (!isExist) {
         return next(new AppError("User not found", 404));
     }
@@ -29,7 +37,7 @@ export const getCharites = asyncHandler(async (req, res, next) => {
 })
 
 export const getRestaurants = asyncHandler(async (req, res, next) => {
-    const isExist = await userModel.find({ role: "restaurant" }, { password: 0 });
+    const isExist = await userModel.find({ role: "restaurant" });
     if (!isExist) {
         return next(new AppError("Users not found", 404));
     }
