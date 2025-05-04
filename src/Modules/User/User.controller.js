@@ -25,7 +25,7 @@ export const getAllUsers = asyncHandler(async (req, res, next) => {
     if (!isExist) {
         return next(new AppError("User not found", 404));
     }
-    res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
+    res.status(200).json({ message: "hello son of hakuna matata", users: isExist });
 })
 
 export const getCharites = asyncHandler(async (req, res, next) => {

@@ -25,12 +25,21 @@ export const login = asyncHandler(async (req, res, next) => {
 });
 
 export const register = asyncHandler(async (req, res, next) => {
-    const { name, email, password, phone, city, address, details, role } = req.body;
+    let { name, email, password, phone, city, address, details, role } = req.body;
     const isExist = await userModel.findOne({ email });
     if (isExist) {
         return next(new AppError("User already exist", 400));
     }
-    const user = await userModel.create({ name, email, password, phone, role, city, address });
+    console.log(req.body.tin);
+
+    if (req.body.tin) {
+        details = {
+            ...details,
+            tin: req.body.tin
+        }
+    }
+
+    const user = await userModel.create({ name, email, password, phone, role, city, address, details });
     const token = jwt.sign(
         { id: user._id, name: user.name },
         process.env.JWT_SECRET
