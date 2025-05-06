@@ -21,9 +21,10 @@ const donationSchema = new mongoose.Schema({
     },
     donationStatus: {
         type: String,
-        enum: ['available', 'reserved', 'completed'],
+        enum: ['available', 'reserved', 'picked'],
         default: 'available'
     },
+    
     image: {
         url: { type: String, default: "default.jpg" },
         publicId: { type: String, default: null }

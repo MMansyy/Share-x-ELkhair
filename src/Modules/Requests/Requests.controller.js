@@ -32,7 +32,8 @@ export const createRequest = asyncHandler(async (req, res, next) => {
 });
 
 export async function getAllRequests(req, res, next) {
-    const requests = await requestModel.find();
+    const status = req.query.status;
+    const requests = await requestModel.find(status ? { status } : {});
     if (!requests) {
         return next(new AppError("No requests found", 404));
     }
@@ -70,7 +71,8 @@ export const updateRequest = asyncHandler(async (req, res, next) => {
     }
     request.status = requestStatus;
     await request.save();
-    return res.status(200).json({ success: true, data: request });
+    const update = await requestModel.updateMany({ donationID: request.donationID, status: "pending" }, { status: 'rejected' });
+    return res.status(200).json({ success: true, data: request, updated: update });
 })
 
 
