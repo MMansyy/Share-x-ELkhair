@@ -27,7 +27,6 @@ export const createRequest = asyncHandler(async (req, res, next) => {
         charityID,
         userID: donation.userID
     });
-
     return res.status(201).json({ success: true, data: request });
 });
 
@@ -41,23 +40,34 @@ export async function getAllRequests(req, res, next) {
 }
 
 
-export const getChairtyRequest = asyncHandler(async (req, res, next) => {
-    const charityID = req.user.id;
-    const requests = await requestModel.find({ charityID }).populate("donationID", "category foodItems donationStatus description image").populate("userID", "name phone city role address");
-    if (!requests) {
+export const getUserRequests = asyncHandler(async (req, res, next) => {
+    const { id, role } = req.user;
+    const filter = {};
+    if (role === "donor" || role === "restaurant") {
+        filter.userID = id;
+    } else if (role === "charity") {
+        filter.charityID = id;
+    } else if (role === "admin") {
+    }
+    else {
+        return next(new AppError("Unauthorized role", 403));
+    }
+    if (req.query.status) {
+        filter.status = req.query.status;
+    }
+    const populateUserField = (role === "charity") ? "userID" : "charityID";
+    const requests = await requestModel
+        .find(filter)
+        .populate("donationID", "category foodItems donationStatus description image")
+        .populate(populateUserField, "name phone city role address");
+    if (!requests || requests.length === 0) {
         return next(new AppError("No requests found", 404));
     }
-    return res.status(200).json({ success: true, data: requests });
-})
-
-export const getDonorRequest = asyncHandler(async (req, res, next) => {
-    const userID = req.user.id;
-    const requests = await requestModel.find({ userID }).populate("donationID", "category foodItems donationStatus description image").populate("charityID", "name phone city role address");
-    if (!requests) {
-        return next(new AppError("No requests found", 404));
-    }
-    return res.status(200).json({ success: true, data: requests });
-})
+    return res.status(200).json({
+        success: true,
+        data: requests
+    });
+});
 
 
 export const updateRequest = asyncHandler(async (req, res, next) => {
