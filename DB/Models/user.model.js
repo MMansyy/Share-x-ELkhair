@@ -63,10 +63,20 @@ const userSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.Mixed,
             default: {},
         },
-        otpCode: {
-            type: String,
-            default: null,
-        },
+        otp: {
+            code: {
+                type: String,
+                default: null,
+            },
+            expires: {
+                type: Date,
+                default: null,
+            },
+            verified: {
+                type: Boolean,
+                default: false,
+            }
+        }
     },
     { timestamps: true, toJSON: { virtuals: true } }
 );

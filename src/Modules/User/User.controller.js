@@ -3,6 +3,7 @@ import cloudinary from "../../../utils/cloudinary.js";
 import fs from "fs";
 import { AppError, asyncHandler } from "../../../utils/GlobalError.js";
 import bcrypt from "bcrypt";
+import sendEmail from "../../../utils/nodemailer.js";
 
 export const getMe = asyncHandler(async (req, res, next) => {
     if (!req.user) {
@@ -60,16 +61,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
 })
 
-export const deleteUser = asyncHandler(async (req, res, next) => {
-    const { _id } = req.user;
-    const isExist = await userModel.findByIdAndDelete(_id);
-    if (!isExist) {
-        return next(new AppError("User not found", 404));
-    }
-    res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
-})
 
-// update user by id
 export const updateUserById = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const data = req.body;
@@ -85,7 +77,14 @@ export const updateUserById = asyncHandler(async (req, res, next) => {
     }
     res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
 })
-
+export const deleteUser = asyncHandler(async (req, res, next) => {
+    const { _id } = req.user;
+    const isExist = await userModel.findByIdAndDelete(_id);
+    if (!isExist) {
+        return next(new AppError("User not found", 404));
+    }
+    res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
+})
 export const updateProfilePicture = asyncHandler(async (req, res, next) => {
     const { _id } = req.user;
     console.log("Received File:", req.file);
@@ -113,7 +112,6 @@ export const updateProfilePicture = asyncHandler(async (req, res, next) => {
     }
     return next(new AppError("Image is required", 400));
 })
-// update password 
 export const updatePassword = asyncHandler(async (req, res, next) => {
     const { _id } = req.user;
     const { currentPassword, newPassword } = req.body;
@@ -139,6 +137,77 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({ message: "hello son of hakuna matata", user: updatedUser });
 })
+
+// forgot password
+export const forgotPassword = asyncHandler(async (req, res, next) => {
+    const { email } = req.body;
+    if (!email) {
+        return next(new AppError("Email is required", 400));
+    }
+    const user = await userModel.findOne({ email });
+    if (!user) {
+        return next(new AppError("User not found", 404));
+    }
+    console.log("User found:", user);
+
+    // send otp
+    const otpCode = Math.floor(100000 + Math.random() * 900000);
+    user.otp = {
+        code: otpCode,
+        expires: Date.now() + 10 * 60 * 1000, // 10 minutes
+        verified: false
+    }
+    await user.save();
+    // send email
+    sendEmail(email, "Reset Password", `Your OTP code is ${otpCode}`);
+    res.status(200).json({ message: "hello son of hakuna matata", user });
+})
+
+// verify otp
+export const verifyOtp = asyncHandler(async (req, res, next) => {
+    const { email, otpCode } = req.body;
+    if (!email || !otpCode) {
+        return next(new AppError("Email and OTP code are required", 400));
+    }
+    const user = await userModel.findOne({ email });
+    if (!user) {
+        return next(new AppError("User not found", 404));
+    }
+    if (user.otpCode !== otpCode) {
+        return next(new AppError("OTP code is not correct", 400));
+    }
+    if (user.otp.expires < Date.now()) {
+        return next(new AppError("OTP code has expired", 400));
+    }
+    user.otp.verified = true;
+    await user.save();
+    res.status(200).json({ message: "hello son of hakuna matata" });
+})
+
+export const resetPassword = asyncHandler(async (req, res, next) => {
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) {
+        return next(new AppError("Email and new password are required", 400));
+    }
+    const user = await userModel.findOne({ email });
+    if (!user) {
+        return next(new AppError("User not found", 404));
+    }
+    if (!user.otp.verified) {
+        return next(new AppError("OTP code is not verified", 400));
+    }
+    const hashedPassword = bcrypt.hashSync(newPassword, 8);
+    user.password = hashedPassword;
+    user.otp = {
+        code: null,
+        expires: null,
+        verified: false
+    }
+    await user.save();
+    res.status(200).json({ message: "hello son of hakuna matata", user });
+})
+
+
 
 
 

@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+dotenv.config();
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -14,13 +16,15 @@ const transporter = nodemailer.createTransport({
 
 // async..await is not allowed in global scope, must use a wrapper
 export default async function sendEmail(to, subject, text, token) {
-  let html = `<head>
+  let html = '';
+  if (token) {
+    html = `<head>
   <title></title>
   <!--[if !mso]><!-- -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <!--<![endif]-->
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<style type="text/css">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <style type="text/css">
   #outlook a { padding: 0; }
   .ReadMsgBody { width: 100%; }
   .ExternalClass { width: 100%; }
@@ -29,45 +33,45 @@ export default async function sendEmail(to, subject, text, token) {
   table, td { border-collapse:collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
   img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
   p { display: block; margin: 13px 0; }
-</style>
-<!--[if !mso]><!-->
-<style type="text/css">
+  </style>
+  <!--[if !mso]><!-->
+  <style type="text/css">
   @media only screen and (max-width:480px) {
     @-ms-viewport { width:320px; }
     @viewport { width:320px; }
   }
-</style>
-<!--<![endif]-->
-<!--[if mso]>
-<xml>
+  </style>
+  <!--<![endif]-->
+  <!--[if mso]>
+  <xml>
   <o:OfficeDocumentSettings>
     <o:AllowPNG/>
     <o:PixelsPerInch>96</o:PixelsPerInch>
   </o:OfficeDocumentSettings>
-</xml>
-<![endif]-->
-<!--[if lte mso 11]>
-<style type="text/css">
+  </xml>
+  <![endif]-->
+  <!--[if lte mso 11]>
+  <style type="text/css">
   .outlook-group-fix {
     width:100% !important;
   }
-</style>
-<![endif]-->
-
-<!--[if !mso]><!-->
+  </style>
+  <![endif]-->
+  
+  <!--[if !mso]><!-->
     <link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700" rel="stylesheet" type="text/css">
     <style type="text/css">
-
+  
         @import url(https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700);
-
+  
     </style>
   <!--<![endif]--><style type="text/css">
   @media only screen and (min-width:480px) {
     .mj-column-per-100, * [aria-labelledby="mj-column-per-100"] { width:100%!important; }
   }
-</style>
-</head>
-<body style="background: #F9F9F9;">
+  </style>
+  </head>
+  <body style="background: #F9F9F9;">
   <div style="background-color:#F9F9F9;"><!--[if mso | IE]>
       <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="640" align="center" style="width:640px;">
         <tr>
@@ -86,7 +90,7 @@ export default async function sendEmail(to, subject, text, token) {
       text-decoration:underline;
     }
   </style>
-<div style="margin:0px auto;max-width:640px;background:transparent;"><table role="presentation" cellpadding="0" cellspacing="0" style="font-size:0px;width:100%;background:transparent;" align="center" border="0"><tbody><tr><td style="text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:40px 0px;"><!--[if mso | IE]>
+  <div style="margin:0px auto;max-width:640px;background:transparent;"><table role="presentation" cellpadding="0" cellspacing="0" style="font-size:0px;width:100%;background:transparent;" align="center" border="0"><tbody><tr><td style="text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:40px 0px;"><!--[if mso | IE]>
       <table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td style="vertical-align:top;width:640px;">
       <![endif]--><div aria-labelledby="mj-column-per-100" class="mj-column-per-100 outlook-group-fix" style="vertical-align:top;display:inline-block;direction:ltr;font-size:13px;text-align:left;width:100%;"><table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr><td style="word-break:break-word;font-size:0px;padding:0px;" align="center"><table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border-spacing:0px;" align="center" border="0"><tbody><tr><td style="width:138px;"><a href="https://discordapp.com/" target="_blank"><img alt="" title="" height="38px" src="https://cdn.discordapp.com/email_assets/2ec94ed90b8e95d764f2a1c96f33139e.png" style="border:none;border-radius:;display:block;outline:none;text-decoration:none;width:100%;height:38px;" width="138"></a></td></tr></tbody></table></td></tr></tbody></table></div><!--[if mso | IE]>
       </td></tr></table>
@@ -119,11 +123,11 @@ export default async function sendEmail(to, subject, text, token) {
       <table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td style="vertical-align:top;width:640px;">
       <![endif]--><div aria-labelledby="mj-column-per-100" class="mj-column-per-100 outlook-group-fix" style="vertical-align:top;display:inline-block;direction:ltr;font-size:13px;text-align:left;width:100%;"><table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr><td style="word-break:break-word;font-size:0px;padding:0px 0px 20px;" align="left"><div style="cursor:auto;color:#737F8D;font-family:Whitney, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;font-size:16px;line-height:24px;text-align:left;">
             <p><img src="https://cdn.discordapp.com/email_assets/127c95bbea39cd4bc1ad87d1500ae27d.png" alt="Party Wumpus" title="None" width="500" style="height: auto;"></p>
-
+  
   <h2 style="font-family: Whitney, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;font-weight: 500;font-size: 20px;color: #4F545C;letter-spacing: 0.27px;">Hey SmilesDavis,</h2>
-<p>Wowwee! Thanks for registering an account with Discord! You're the coolest person in all the land (and I've met a lot of really cool people).</p>
-<p>Before we get started, we'll need to verify your email.</p>
-
+  <p>Wowwee! Thanks for registering an account with Discord! You're the coolest person in all the land (and I've met a lot of really cool people).</p>
+  <p>Before we get started, we'll need to verify your email.</p>
+  
           </div></td></tr><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;" align="center"><table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:separate;" align="center" border="0"><tbody><tr><td style="border:none;border-radius:3px;color:white;cursor:auto;padding:15px 19px;" align="center" valign="middle" bgcolor="#7289DA"><a href="${`http://localhost:3000/auth/verify/${token}`}" style="text-decoration:none;line-height:100%;background:#7289DA;color:white;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:15px;font-weight:normal;text-transform:none;margin:0px;" target="_blank">
             Verify Email
           </a></td></tr></tbody></table></td></tr></tbody></table></div><!--[if mso | IE]>
@@ -170,8 +174,9 @@ export default async function sendEmail(to, subject, text, token) {
       <![endif]--></td></tr></tbody></table></div><!--[if mso | IE]>
       </td></tr></table>
       <![endif]--></div>
-
-</body>`
+  
+  </body>`
+  }
   // send mail with defined transport object
   console.log("sending email");
 
