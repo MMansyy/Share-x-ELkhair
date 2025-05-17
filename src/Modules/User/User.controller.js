@@ -60,6 +60,32 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
 })
 
+export const deleteUser = asyncHandler(async (req, res, next) => {
+    const { _id } = req.user;
+    const isExist = await userModel.findByIdAndDelete(_id);
+    if (!isExist) {
+        return next(new AppError("User not found", 404));
+    }
+    res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
+})
+
+// update user by id
+export const updateUserById = asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+    const data = req.body;
+    if (data.email) {
+        delete data.email;
+    }
+    if (data.password) {
+        return next(new AppError("You can't update password from here", 400));
+    }
+    const isExist = await userModel.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+    if (!isExist) {
+        return next(new AppError("User not found", 404));
+    }
+    res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
+})
+
 export const updateProfilePicture = asyncHandler(async (req, res, next) => {
     const { _id } = req.user;
     console.log("Received File:", req.file);
@@ -87,7 +113,6 @@ export const updateProfilePicture = asyncHandler(async (req, res, next) => {
     }
     return next(new AppError("Image is required", 400));
 })
-
 // update password 
 export const updatePassword = asyncHandler(async (req, res, next) => {
     const { _id } = req.user;
