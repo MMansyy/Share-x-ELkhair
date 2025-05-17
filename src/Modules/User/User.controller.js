@@ -204,7 +204,7 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
         verified: false
     }
     await user.save();
-    res.status(200).json({ message: "hello son of hakuna matata", user });
+    res.status(200).json({ message: "Password reseted try to login now!", user });
 })
 
 
