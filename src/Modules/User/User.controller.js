@@ -173,7 +173,7 @@ export const verifyOtp = asyncHandler(async (req, res, next) => {
     if (!user) {
         return next(new AppError("User not found", 404));
     }
-    if (user.otpCode !== otpCode) {
+    if (user.otp.code !== otpCode) {
         return next(new AppError("OTP code is not correct", 400));
     }
     if (user.otp.expires < Date.now()) {
