@@ -11,7 +11,6 @@ export const getMe = asyncHandler(async (req, res, next) => {
     }
     res.status(200).json({ message: "hello son of hakuna matata", user: req.user });
 })
-
 export const getUser = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const isExist = await userModel.findById(id, { password: 0 });
@@ -20,7 +19,6 @@ export const getUser = asyncHandler(async (req, res, next) => {
     }
     res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
 })
-
 export const getAllUsers = asyncHandler(async (req, res, next) => {
     const isExist = await userModel.find({}).select("-password -otpCode -__v -createdAt -updatedAt");
     if (!isExist) {
@@ -28,7 +26,6 @@ export const getAllUsers = asyncHandler(async (req, res, next) => {
     }
     res.status(200).json({ message: "hello son of hakuna matata", users: isExist });
 })
-
 export const getCharites = asyncHandler(async (req, res, next) => {
     const isExist = await userModel.find({ role: "charity" }).select("-password -otpCode -__v -createdAt -updatedAt");;
     if (!isExist) {
@@ -36,7 +33,6 @@ export const getCharites = asyncHandler(async (req, res, next) => {
     }
     res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
 })
-
 export const getRestaurants = asyncHandler(async (req, res, next) => {
     const isExist = await userModel.find({ role: "restaurant" });
     if (!isExist) {
@@ -44,7 +40,6 @@ export const getRestaurants = asyncHandler(async (req, res, next) => {
     }
     res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
 })
-
 export const updateUser = asyncHandler(async (req, res, next) => {
     const { _id } = req.user;
     const data = req.body;
@@ -60,17 +55,9 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     }
     res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
 })
-
-
 export const updateUserById = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const data = req.body;
-    if (data.email) {
-        delete data.email;
-    }
-    if (data.password) {
-        return next(new AppError("You can't update password from here", 400));
-    }
     const isExist = await userModel.findByIdAndUpdate(id, data, { new: true, runValidators: true });
     if (!isExist) {
         return next(new AppError("User not found", 404));
@@ -80,6 +67,14 @@ export const updateUserById = asyncHandler(async (req, res, next) => {
 export const deleteUser = asyncHandler(async (req, res, next) => {
     const { _id } = req.user;
     const isExist = await userModel.findByIdAndDelete(_id);
+    if (!isExist) {
+        return next(new AppError("User not found", 404));
+    }
+    res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
+})
+export const deleteUserById = asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+    const isExist = await userModel.findByIdAndDelete(id);
     if (!isExist) {
         return next(new AppError("User not found", 404));
     }
@@ -137,8 +132,6 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({ message: "hello son of hakuna matata", user: updatedUser });
 })
-
-// forgot password
 export const forgotPassword = asyncHandler(async (req, res, next) => {
     const { email } = req.body;
     if (!email) {
@@ -162,8 +155,6 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
     sendEmail(email, "Reset Password", `Your OTP code is ${otpCode}`);
     res.status(200).json({ message: "hello son of hakuna matata", user });
 })
-
-// verify otp
 export const verifyOtp = asyncHandler(async (req, res, next) => {
     const { email, otpCode } = req.body;
     if (!email || !otpCode) {
@@ -183,7 +174,6 @@ export const verifyOtp = asyncHandler(async (req, res, next) => {
     await user.save();
     res.status(200).json({ message: "hello son of hakuna matata" });
 })
-
 export const resetPassword = asyncHandler(async (req, res, next) => {
     const { email, newPassword } = req.body;
     if (!email || !newPassword) {
@@ -196,8 +186,7 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
     if (!user.otp.verified) {
         return next(new AppError("OTP code is not verified", 400));
     }
-    const hashedPassword = bcrypt.hashSync(newPassword, 8);
-    user.password = hashedPassword;
+    user.password = newPassword;
     user.otp = {
         code: null,
         expires: null,

@@ -13,7 +13,10 @@ export const login = asyncHandler(async (req, res, next) => {
     if (!isExist) {
         return next(new AppError("User not found", 404));
     }
+    console.log(isExist);
+    
     const compare = bcrypt.compareSync(password, isExist.password);
+    console.log(compare);
     if (!compare) {
         return next(new AppError("Password is not correct", 400));
     }
