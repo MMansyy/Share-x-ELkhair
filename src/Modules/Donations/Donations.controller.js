@@ -6,7 +6,14 @@ import donationSchema from "./Donation.validation.js";
 
 
 export const getDonations = asyncHandler(async (req, res, next) => {
-    const donations = await donationModel.find({ donationStatus: "available" }).populate("userID", "name phone city address profilePicture")
+    const { userID } = req.query
+    let filter = {
+        donationStatus: "available"
+    };
+    if (userID) {
+        filter.userID = userID
+    }
+    const donations = await donationModel.find(filter).populate("userID", "name phone city address profilePicture")
     res.status(200).json({ message: "hello son of hakuna matata", donations });
 })
 

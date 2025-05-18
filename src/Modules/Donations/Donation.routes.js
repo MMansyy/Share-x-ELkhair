@@ -14,7 +14,7 @@ DonationRouter.get('/', getDonations)
     .get('/mydonations', protectedRoutes, getMyDonations)
     .get('/:id', getSingleDonation)
     .put('/:id', protectedRoutes, uploadSingle, updateDonation)
-    .delete('/:id', protectedRoutes, deleteDonation)
+    .delete('/:id', protectedRoutes, allowTo("donor", "restaurant", "admin"), deleteDonation)
 
 
 export default DonationRouter;
