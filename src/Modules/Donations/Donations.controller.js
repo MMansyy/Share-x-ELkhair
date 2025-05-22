@@ -119,10 +119,6 @@ export const updateDonation = asyncHandler(async (req, res, next) => {
 
 
 export const deleteDonation = asyncHandler(async (req, res, next) => {
-    const roles = ["donor", "restaurant", "admin"];
-    if (!roles.includes(req.user.role)) {
-        return next(new AppError("You are not allowed to delete donation", 400));
-    }
     const { id } = req.params;
     const donation = await donationModel.findById(id);
     if (!donation) {
@@ -132,7 +128,11 @@ export const deleteDonation = asyncHandler(async (req, res, next) => {
         return next(new AppError("You are not allowed to delete this donation", 400));
     }
     if (donation.image?.publicId) {
-        await cloudinary.uploader.destroy(donation.image.publicId);
+        try {
+            await cloudinary.uploader.destroy(donation.image.publicId);
+        } catch (err) {
+            return next(new AppError(err.message, 500));
+        }
     }
     const deletedDonation = await donationModel.findByIdAndDelete(id);
     if (!deletedDonation) {

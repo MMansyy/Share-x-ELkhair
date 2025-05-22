@@ -20,7 +20,9 @@ export const getUser = asyncHandler(async (req, res, next) => {
     res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
 })
 export const getAllUsers = asyncHandler(async (req, res, next) => {
-    const isExist = await userModel.find({}).select("-password -otpCode -__v -createdAt -updatedAt");
+    const isExist = await userModel.find({
+        role: { $ne: "admin" }
+    }).select("-password -otpCode -__v -createdAt -updatedAt");
     if (!isExist) {
         return next(new AppError("User not found", 404));
     }

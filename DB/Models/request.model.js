@@ -20,6 +20,11 @@ const requestSchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'accepted', 'rejected'],
         default: 'pending'
+    },
+    deliveryStatus: {
+        type: String,
+        enum: ['pending', 'delivered'],
+        default: 'pending'
     }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
