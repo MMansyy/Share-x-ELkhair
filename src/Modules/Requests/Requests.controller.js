@@ -59,7 +59,8 @@ export const getUserRequests = asyncHandler(async (req, res, next) => {
     const requests = await requestModel
         .find(filter)
         .populate("donationID", "category foodItems donationStatus description image")
-        .populate(populateUserField, "name phone city role address");
+        .populate(populateUserField, "name phone city role address")
+        .sort({ createdAt: -1 });
     if (!requests || requests.length === 0) {
         return next(new AppError("No requests found", 404));
     }
