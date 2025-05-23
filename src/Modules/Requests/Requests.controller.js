@@ -1,4 +1,3 @@
-import { promise } from "selenium-webdriver";
 import donationModel from "../../../DB/Models/donation.model.js";
 import requestModel from "../../../DB/Models/request.model.js";
 import { AppError, asyncHandler } from "../../../utils/GlobalError.js";
