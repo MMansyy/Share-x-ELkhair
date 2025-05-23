@@ -1,6 +1,8 @@
+import { promise } from "selenium-webdriver";
 import donationModel from "../../../DB/Models/donation.model.js";
 import requestModel from "../../../DB/Models/request.model.js";
 import { AppError, asyncHandler } from "../../../utils/GlobalError.js";
+import { createNotification } from "../Notfication/Notfication.controller.js";
 
 
 
@@ -27,6 +29,12 @@ export const createRequest = asyncHandler(async (req, res, next) => {
         charityID,
         userID: donation.userID
     });
+    await createNotification(
+        donation.userID._id,
+        charityID,
+        "request",
+        request._id
+    );
     return res.status(201).json({ success: true, data: request });
 });
 
@@ -82,8 +90,40 @@ export const updateRequest = asyncHandler(async (req, res, next) => {
     }
     request.status = requestStatus;
     await request.save();
-    const update = await requestModel.updateMany({ donationID: request.donationID, status: "pending" }, { status: 'rejected' });
-    return res.status(200).json({ success: true, data: request, updated: update });
+    if (requestStatus === "accepted") {
+        const donation = await donationModel.findById(request.donationID);
+        if (!donation) {
+            return next(new AppError("Donation not found", 404));
+        }
+        donation.donationStatus = "reserved";
+        await donation.save();
+        const pendingRequests = await requestModel.find({ donationID: request.donationID, status: "pending" });
+        const rejected = await requestModel.updateMany({ donationID: request.donationID, status: "pending" }, { status: 'rejected' });
+        if (pendingRequests.length > 0) {
+            await Promise.all(pendingRequests.map((req) => {
+                return createNotification(
+                    req.userID._id,
+                    req.charityID,
+                    "rejected",
+                    req._id
+                );
+            }));
+        }
+        await createNotification(
+            request.userID._id,
+            request.charityID,
+            "accepted",
+            request._id
+        );
+    } else if (requestStatus === "rejected") {
+        await createNotification(
+            request.userID._id,
+            request.charityID,
+            "rejected",
+            request._id
+        );
+    }
+    return res.status(200).json({ success: true, data: request });
 })
 
 
