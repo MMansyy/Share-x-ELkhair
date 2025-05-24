@@ -71,12 +71,24 @@ export const updateUserById = asyncHandler(async (req, res, next) => {
 })
 export const deleteUser = asyncHandler(async (req, res, next) => {
     const { _id } = req.user;
+    const { password } = req.body;
+    if (!password) {
+        return next(new AppError("Password is required", 400));
+    }
+    const user = await userModel.findById(_id);
+    if (!user) {
+        return next(new AppError("User not found", 404));
+    }
+    const compare = bcrypt.compareSync(password, user.password);
+    if (!compare) {
+        return next(new AppError("Password is not correct", 400));
+    }
     const isExist = await userModel.findByIdAndDelete(_id);
     if (!isExist) {
         return next(new AppError("User not found", 404));
     }
     if (isExist.profilePicture?.publicId) {
-        await cloudinary.uploader.destroy(isExist.profilePicture.publicId);
+        await cloudinary.uploader.destroy(isExist.profilePicture?.publicId);
     }
     await Promise.all([
         notificationModel.deleteMany({ $or: [{ sender: _id }, { receiver: _id }] }),
