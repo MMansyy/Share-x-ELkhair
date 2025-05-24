@@ -29,8 +29,8 @@ export const createRequest = asyncHandler(async (req, res, next) => {
         userID: donation.userID
     });
     await createNotification(
-        donation.userID._id,
         charityID,
+        donation.userID._id,
         "request",
         request._id
     );
