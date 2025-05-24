@@ -4,6 +4,9 @@ import fs from "fs";
 import { AppError, asyncHandler } from "../../../utils/GlobalError.js";
 import bcrypt from "bcrypt";
 import sendEmail from "../../../utils/nodemailer.js";
+import notificationModel from "../../../DB/Models/notfication.model.js";
+import requestModel from "../../../DB/Models/request.model.js";
+import donationModel from "../../../DB/Models/donation.model.js";
 
 export const getMe = asyncHandler(async (req, res, next) => {
     if (!req.user) {
@@ -72,14 +75,28 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
     if (!isExist) {
         return next(new AppError("User not found", 404));
     }
-    res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
-})
+    if (isExist.profilePicture?.publicId) {
+        await cloudinary.uploader.destroy(isExist.profilePicture.publicId);
+    }
+    await Promise.all([
+        notificationModel.deleteMany({ $or: [{ sender: _id }, { receiver: _id }] }),
+        requestModel.deleteMany({ $or: [{ userID: _id }, { charityID: _id }] }),
+        donationModel.deleteMany({ $or: [{ userID: _id }, { charityID: _id }] })
+    ]);
+
+    res.status(200).json({
+        message: "User and related data deleted successfully.",
+        user: isExist
+    });
+});
+
 export const deleteUserById = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const isExist = await userModel.findByIdAndDelete(id);
     if (!isExist) {
         return next(new AppError("User not found", 404));
     }
+
     res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
 })
 export const updateProfilePicture = asyncHandler(async (req, res, next) => {
