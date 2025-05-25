@@ -24,7 +24,7 @@ export const getNotifications = asyncHandler(async (req, res, next) => {
     if (!notifications) {
         return next(new AppError("No notifications found", 404));
     }
-    return res.status(200).json({ success: true, data: notifications });
+    return res.status(200).json({ success: true, number: notifications.length, data: notifications });
 });
 
 
