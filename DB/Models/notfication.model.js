@@ -13,7 +13,7 @@ const notificationSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['accepted', 'rejected', 'request'],
+        enum: ['accepted', 'rejected', 'request', 'deliverd'],
         required: true
     },
     requestID: {

@@ -14,7 +14,7 @@ RequestRouter.get('/', protectedRoutes, allowTo('donor', 'restaurant', 'charity'
 
 RequestRouter.post('/', protectedRoutes, allowTo('charity'), createRequest);
 
-RequestRouter.put('/', protectedRoutes, allowTo('donor', 'restaurant', 'admin'), updateRequest);
+RequestRouter.put('/', protectedRoutes, updateRequest);
 
 RequestRouter.delete('/', protectedRoutes, allowTo('charity', 'admin'), deleteRequest);
 
