@@ -88,6 +88,9 @@ export const updateRequest = asyncHandler(async (req, res, next) => {
     if (!donation) {
         return next(new AppError("Donation not found", 404));
     }
+    if (requestStatus && deliveryStatus) {
+        return next(new AppError("You can only update one status at a time", 400));
+    }
     if (!requestStatus && deliveryStatus) {
         request.deliveryStatus = deliveryStatus;
         await request.save();
