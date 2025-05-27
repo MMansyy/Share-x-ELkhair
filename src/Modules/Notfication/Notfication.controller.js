@@ -3,7 +3,7 @@ import { asyncHandler } from "../../../utils/GlobalError.js";
 
 
 export const createNotification = async (sender, receiver, type, requestID) => {
-    const ALLOWED_TYPES = ['accepted', 'rejected', 'request'];
+    const ALLOWED_TYPES = ['accepted', 'rejected', 'request', 'deliverd'];
     if (!sender || !receiver || !type) {
         throw new Error("Missing required notification fields: sender, receiver, or type");
     }
