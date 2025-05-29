@@ -33,15 +33,9 @@ export const register = asyncHandler(async (req, res, next) => {
     if (isExist) {
         return next(new AppError("User already exist", 400));
     }
-    console.log(req.body.tin);
-
-    if (req.body.tin) {
-        details = {
-            ...details,
-            tin: req.body.tin
-        }
+    if (!name || !email || !password || !phone || !city || !address) {
+        return next(new AppError("All fields are required", 400));
     }
-
     const user = await userModel.create({ name, email, password, phone, role, city, address, details });
     const token = jwt.sign(
         { id: user._id, name: user.name },
