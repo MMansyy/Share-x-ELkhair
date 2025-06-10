@@ -69,6 +69,22 @@ export const updateUserById = asyncHandler(async (req, res, next) => {
     }
     res.status(200).json({ message: "hello son of hakuna matata", user: isExist });
 })
+export const updateUserByEmail = asyncHandler(async (req, res, next) => {
+    const { email } = req.body;
+    if (!email) {
+        return next(new AppError("Email is required", 400));
+    }
+    const isExist = await userModel.findOneAnd({ email })
+    if (!isExist) {
+        return next(new AppError("User not found", 404));
+    }
+    const data = req.body;
+    const updatedUser = await userModel.findOneAndUpdate(email, data, { new: true, runValidators: true });
+    if (!updatedUser) {
+        return next(new AppError("User not found", 404));
+    }
+    res.status(200).json({ message: "Done", user: updatedUser });
+})
 export const deleteUser = asyncHandler(async (req, res, next) => {
     const { _id } = req.user;
     const { password } = req.body;
@@ -101,7 +117,6 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
         user: isExist
     });
 });
-
 export const deleteUserById = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const isExist = await userModel.findByIdAndDelete(id);

@@ -3,6 +3,8 @@ import cloudinary from "../../../utils/cloudinary.js";
 import { AppError, asyncHandler } from "../../../utils/GlobalError.js";
 import fs from "fs";
 import donationSchema from "./Donation.validation.js";
+import requestModel from "../../../DB/Models/request.model.js";
+import notificationModel from "../../../DB/Models/notfication.model.js";
 
 
 export const getDonations = asyncHandler(async (req, res, next) => {
@@ -134,12 +136,23 @@ export const deleteDonation = asyncHandler(async (req, res, next) => {
             return next(new AppError(err.message, 500));
         }
     }
+    const relatedRequests = await requestModel.find({ donationID: id });
+    const requestIDs = relatedRequests.map(req => req._id);
+    const deleteNotifications = await notificationModel.deleteMany({ requestID: { $in: requestIDs } });
+    if (deleteNotifications.deletedCount > 0) {
+        console.log(`Deleted ${deleteNotifications.deletedCount} notifications related to the requests.`);
+    }
+    const deleteRequests = await requestModel.deleteMany({ donationID: id });
+    if (deleteRequests.deletedCount > 0) {
+        console.log(`Deleted ${deleteRequests.deletedCount} requests related to the donation.`);
+    }
     const deletedDonation = await donationModel.findByIdAndDelete(id);
     if (!deletedDonation) {
         return next(new AppError("Donation not deleted", 400));
     }
-    return res.status(200).json({ message: "hello son of hakuna matata its deleted", deletedDonation });
-})
+    return res.status(200).json({ message: 'Donation deleted successufully', deletedDonation });
+});
+
 
 
 
