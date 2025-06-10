@@ -28,3 +28,12 @@ export const getNotifications = asyncHandler(async (req, res, next) => {
 });
 
 
+export const deleteNotifications = asyncHandler(async (req, res, next) => {
+    const { id } = req.user;
+    const deleteNotifications = await notificationModel.deleteMany({ receiver: id });
+    if (deleteNotifications.deletedCount === 0) {
+        return next(new AppError("No notifications found to delete", 404));
+    }
+    return res.status(200).json({ success: true, message: "Notifications deleted successfully" });
+})
+
