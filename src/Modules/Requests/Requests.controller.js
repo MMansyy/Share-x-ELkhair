@@ -170,6 +170,10 @@ export const deleteRequest = asyncHandler(async (req, res, next) => {
     if (request.charityID._id.toString() !== req.user.id && req.user.role !== "admin") {
         return next(new AppError("You are not authorized to delete this request", 403));
     }
+    const deleteNotifications = await requestModel.deleteMany({ donationID: request.donationID._id });
+    if (deleteNotifications.deletedCount === 0) {
+        return next(new AppError("No notifications found to delete", 404));
+    }
     await requestModel.findByIdAndDelete(requestID);
     return res.status(200).json({ success: true, data: {} });
 });

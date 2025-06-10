@@ -36,7 +36,7 @@ const requestSchema = new mongoose.Schema({
 
 requestSchema.pre(/^find/, function (next) {
     this.populate([
-        { path: "donationID", select: "category foodItems description image" },
+        { path: "donationID", select: "category foodItems description image _id" },
         { path: "userID", select: "name phone city role address profilePicture" },
         { path: "charityID", select: "name phone city role address profilePicture" }
     ]);
