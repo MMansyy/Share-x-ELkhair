@@ -14,7 +14,9 @@ export const login = asyncHandler(async (req, res, next) => {
         return next(new AppError("User not found", 404));
     }
     console.log(isExist);
-    
+    // if (isExist.verificationStatus !== "verified") {
+    //     return next(new AppError("We are reviewing your account please try again later", 400));
+    // }
     const compare = bcrypt.compareSync(password, isExist.password);
     console.log(compare);
     if (!compare) {
