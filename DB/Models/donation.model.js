@@ -24,10 +24,14 @@ const donationSchema = new mongoose.Schema({
         enum: ['available', 'reserved', 'picked'],
         default: 'available'
     },
-    
+
     image: {
         url: { type: String, default: "default.jpg" },
         publicId: { type: String, default: null }
+    },
+    expirationDate: {
+        type: String,
+        required: [true, "Expiration date is required"]
     }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
