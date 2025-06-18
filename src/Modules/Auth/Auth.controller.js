@@ -68,9 +68,9 @@ export const protectedRoutes = asyncHandler(async (req, res, next) => {
     if (!isExist) {
         return next(new AppError("User not found", 404));
     }
-    if (!isExist.emailVerified) {
-        return next(new AppError("Email is not verified", 400));
-    }
+    // if (!isExist.emailVerified) {
+    //     return next(new AppError("Email is not verified", 400));
+    // }
     req.user = isExist;
     console.log("hello from here", realToken);
     next();
