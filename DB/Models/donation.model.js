@@ -31,7 +31,7 @@ const donationSchema = new mongoose.Schema({
     },
     expirationDate: {
         type: String,
-        required: [true, "Expiration date is required"]
+        // required: [true, "Expiration date is required"]
     }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
