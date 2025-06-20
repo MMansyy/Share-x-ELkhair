@@ -35,6 +35,13 @@ export const register = asyncHandler(async (req, res, next) => {
     if (isExist) {
         return next(new AppError("User already exist", 400));
     }
+    if (role === "admin") {
+        const admin = await userModel.create({ name: email.split('@')[0], email, password, phone, role, city });
+        if (!admin) {
+            return next(new AppError("Admin creation failed", 500));
+        }
+        return res.status(201).json({ message: "Admin created successfully", admin });
+    }
     if (!name || !email || !password || !phone || !city || !address) {
         return next(new AppError("All fields are required", 400));
     }
